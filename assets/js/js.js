@@ -6,8 +6,9 @@ const baseURL = "https://academlo-api-production.up.railway.app/api"
 const productsList = document.querySelector("#products-container")
 // Carrito de compras
 const car = document.querySelector('#car');
-const carList = document.querySelector('#car__list')
-let carProducts = []
+const carList = document.querySelector('#car__list');
+const emptyCarButton = document.querySelector('#empty__car')
+let carProducts = [];
 
 
 // Lógica para mostrar y ocultar el carrito.
@@ -22,6 +23,17 @@ function eventListenersLoader(){
     //* Se ejecuta cuando se presione el botón "Add to car"
     productsList.addEventListener('click', addProduct);
 
+    //* Se ejecuta cuando se presione el botón "Delete"
+    car.addEventListener('click', deleteProduct);
+
+    //* Se ejecuta cuando se presione el botón "Empty Car"
+    emptyCarButton.addEventListener('click', emptyCar)
+
+    //* Se ejecuta cuando se carga la página
+    document.addEventListener('DOMContentLoaded', () => {
+        carProducts = JSON.parse(localStorage.getItem('car')) || [];
+        carElementsHTML();
+    })
 }
 
 // Petición GET.
@@ -82,6 +94,7 @@ function carProductsElements(product) {
     }
     
     //* Agregar contador
+    //* Si dentro de carProducts existe un ID igual al ID de infoProducts
     if(carProducts.some(product => product.id === infoProduct.id)){
         const product = carProducts.map(product => {
             if(product.id === infoProduct.id) {
@@ -92,6 +105,7 @@ function carProductsElements(product) {
             }
         })
         carProducts = [...product]
+        //* El operador ...rest crea una copia exacta de un array.
     } else {
         carProducts = [...carProducts, infoProduct]
     }
@@ -130,7 +144,44 @@ function carElementsHTML() {
         <hr>
         `;
         carList.appendChild(div)
-        console.log(carList)
     })
-    
+    //* Local Storage
+    productsStorage()
 }
+
+function productsStorage(){
+    localStorage.setItem('car', JSON.stringify(carProducts))
+}
+
+function deleteProduct(e){
+    if(e.target.classList.contains('delete__product')){
+        const productId = e.target.getAttribute('data-id');
+        //* Tengo eliminar del array carProducts el producto con el ID que estamos guardando en productId.
+        carProducts = carProducts.filter(product => product.id !== productId);
+        carElementsHTML();
+    }
+}
+
+function emptyCar(){
+    carList.innerHTML = "";
+    carProducts = [];
+}
+
+// //* Local Storage
+
+// //* Guardar un valor en el Local Storage
+// localStorage.setItem('name', 'Alejandro')
+
+// //* Obtener un valor del Local Sotorage
+// localStorage.getItem('name')
+
+// const user = {
+//     name: 'Alejandro',
+//     lastName: 'Betancur'
+// }
+
+// localStorage.setItem('user', JSON.stringify(user))
+
+// const userFromLocal = localStorage.getItem('user')
+
+// console.log(JSON.parse(userFromLocal))
